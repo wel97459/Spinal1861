@@ -1,10 +1,10 @@
-package Spinal1802
+package Spinal1861
 
 import spinal.core._
 import spinal.core.sim._
 
 import scala.util.control._
-import mylib.lcd_tv
+import Spinal1802._
 
 class Sim_VIP extends Component {
   val io = new Bundle {
@@ -68,13 +68,6 @@ class Sim_VIP extends Component {
 
       io.Addr16 := addressRemapped
   }
-
-  val TV = new lcd_tv(10)
-  val dClk = (areaDiv10.Cpu.io.TPB && areaDiv10.Cpu.io.SC === 2)
-  TV.io.startFrame := !areaDiv10.Pixie.io.VSync
-  TV.io.startLine := !areaDiv10.Pixie.io.DMAO
-  TV.io.dataClk := dClk.rise()
-  TV.io.data := areaDiv10.Cpu.io.DataOut
 }
 
 

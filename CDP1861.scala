@@ -1,8 +1,10 @@
-package Spinal1802
+package Spinal1861
 
 import spinal.core._
 import spinal.core.sim._
 import spinal.lib._
+
+import Spinal1802._
 
 import scala.util.control.Breaks
 
