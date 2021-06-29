@@ -1,10 +1,10 @@
-package Spinal1861
+package Spinal1802
 
 import spinal.core._
 import spinal.core.sim._
 
 import scala.util.control._
-import Spinal1802._
+import mylib.lcd_tv
 
 class Sim_VIP extends Component {
   val io = new Bundle {
@@ -20,18 +20,23 @@ class Sim_VIP extends Component {
     val DataOut = out Bits(8 bits)
 
     val Addr16 = out Bits(13 bits)
+
+    val lcd_rst = out Bool
+    val lcd_dc = out Bool
+    val lcd_sdo = out Bool
+    val lcd_sck = out Bool
   }
 
-  val areaDiv10 = new SlowArea(70) { 
+  val areaDiv10 = new SlowArea(10) { 
       val addressRemapped = Bits(13 bits)
       val remapper = Reg(Bool) init (False)
 
       //Setup CPU
-      val Cpu = new CDP1802()
+      val Cpu = new Spinal1802()
       Cpu.io.Wait_n := True
       Cpu.io.DMA_In_n := True
 
-      val Pixie = new CDP1861_Div10()
+      val Pixie = new Spinal1861(10)
       Pixie.io.DataIn := Cpu.io.DataOut
       Pixie.io.SC := Cpu.io.SC
       Pixie.io.TPA := Cpu.io.TPA
@@ -68,9 +73,25 @@ class Sim_VIP extends Component {
 
       io.Addr16 := addressRemapped
   }
+
+  val TV = new lcd_tv(5)
+  io.lcd_dc := TV.io.lcd_dc
+  io.lcd_rst := TV.io.lcd_rst
+  io.lcd_sck := TV.io.lcd_sck
+  io.lcd_sdo := TV.io.lcd_sdo
+  
+  val dClk = (areaDiv10.Cpu.io.TPB && areaDiv10.Cpu.io.SC === 2)
+  TV.io.startFrame := !areaDiv10.Pixie.io.INT
+  TV.io.startLine := !areaDiv10.Pixie.io.DMAO
+  TV.io.dataClk := dClk.rise()
+  TV.io.data := areaDiv10.Cpu.io.DataOut
 }
 
-
+object Testing_VIP {
+    def main(args: Array[String]) {
+        SpinalVerilog(new Sim_VIP)
+    }
+}
 
 object cpu1802_Testing_VIP {
   def main(args: Array[String]) {
@@ -108,7 +129,7 @@ object cpu1802_Testing_VIP {
             c += 1
           }
           t = dut.areaDiv10.Pixie.lineCounter.willOverflow.toBoolean
-          if(c == 1) {
+          if(c == 5) {
               loop.break;
           }
         }
