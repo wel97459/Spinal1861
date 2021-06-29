@@ -221,7 +221,7 @@ object VIP_Test {
 }
 
 
-object CDP1861_Test {
+object Spinal1861_Test {
     def main(args: Array[String]) {
         SimConfig.withWave.compile{
             val dut = new Spinal1861(0)
