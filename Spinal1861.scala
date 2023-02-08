@@ -12,25 +12,25 @@ import scala.util.control.Breaks
 
 class Spinal1861(val divideBy: BigInt) extends Component{
     val io = new Bundle {
-        val Reset_ = in Bool
-        val Disp_On = in Bool
-        val Disp_Off = in Bool
-        val TPA = in Bool
-        val TPB = in Bool
+        val Reset_ = in Bool()
+        val Disp_On = in Bool()
+        val Disp_Off = in Bool()
+        val TPA = in Bool()
+        val TPB = in Bool()
         val SC = in Bits (2 bit)
         val DataIn = in Bits (8 bit)
 
-        val Clear = out Bool
-        val INT = out Bool
-        val DMAO = out Bool
-        val EFx = out Bool
+        val Clear = out Bool()
+        val INT = out Bool()
+        val DMAO = out Bool()
+        val EFx = out Bool()
 
-        val Video = out Bool
-        val CompSync_ = out Bool
-        val Locked = out Bool
+        val Video = out Bool()
+        val CompSync_ = out Bool()
+        val Locked = out Bool()
 
-        val VSync = out Bool
-        val HSync = out Bool
+        val VSync = out Bool()
+        val HSync = out Bool()
     }
 
     io.Clear := RegNext(io.Reset_)
@@ -143,11 +143,11 @@ class Spinal1861(val divideBy: BigInt) extends Component{
 
 class CosmacVIP extends Component {
     val io = new Bundle {
-        val Reset_ = in Bool
+        val Reset_ = in Bool()
         val Addr = out Bits(16 bit)
 
-        val MRD = out Bool
-        val MWR = out Bool
+        val MRD = out Bool()
+        val MWR = out Bool()
         val DataIn = in Bits(8 bit)
         val DataOut = out Bits(8 bit)
     }
