@@ -33,7 +33,7 @@ class Spinal1861(val divideBy: BigInt) extends Component{
         val HSync = out Bool()
     }
 
-    io.Clear := RegNext(io.Reset_)
+    io.Clear := True
 
     // configure the clock domain
     val InvertedClockDomain = ClockDomain(
@@ -55,7 +55,7 @@ class Spinal1861(val divideBy: BigInt) extends Component{
         lineCounter.clear()
         syncCounter.clear()
         MCycleCounter.clear()
-
+        io.Clear := False
     }
 
     when(syncCounter =/= 0 || (MCycleCounter === 26 && lineCounter === 0 && io.TPA && io.SC =/= 0)){
