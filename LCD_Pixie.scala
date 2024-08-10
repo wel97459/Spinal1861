@@ -5,7 +5,7 @@ import spinal.lib._
 import spinal.lib.fsm._
 
 import TFT_Driver._
-import MyHardware._
+import MySpinalHardware._
 
 object LCD_Pixie {
     def apply(cycles: BigInt) : LCD_Pixie = new LCD_Pixie(cycles)

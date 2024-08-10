@@ -5,7 +5,7 @@ import spinal.core.sim._
 import spinal.lib._
 
 import scala.util.control.Breaks
-
+import Spinal1802._
 //Line 14 cpu cycles, 6 opcode and 8 DMA. 14 x 8 = 112
 //Lines 262
 //There are 29 CPU cycles after going to interrupt
