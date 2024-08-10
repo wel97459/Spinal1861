@@ -1,4 +1,4 @@
-package Spinal1802
+package Spinal1861
 
 import spinal.core._
 import spinal.core.sim._
