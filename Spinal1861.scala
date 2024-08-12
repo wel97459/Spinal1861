@@ -179,26 +179,23 @@ class CosmacVIP extends Component {
 
 object VIP_Test {
     def main(args: Array[String]) {
-        SimConfig.withWave.compile{
+        SimConfig.withFstWave.compile{
             val dut = new CosmacVIP()
             dut.Pixie.lineCounter.willOverflow.simPublic()
             dut
         }.doSim { dut =>
-            val ram = new Memory(log2Up(0x1fff))
-            ram.loadBin(0x00000, "./data/test_1861.bin")
+            val ram = new Memory(0x2fff)
+            ram.loadBin(0x0000, "./data/test_1861.bin")
             //Fork a process to generate the reset and the clock on the dut
             dut.clockDomain.forkStimulus(period = 10)
-            dut.io.Reset_ #= false
-            dut.clockDomain.waitRisingEdge()
-            dut.clockDomain.waitRisingEdge()
-            dut.clockDomain.waitRisingEdge()
-            dut.clockDomain.waitRisingEdge()
-            dut.io.Reset_ #= true
+
             var c = 0;
+            var i = 0;
 
             val loop = new Breaks;
             loop.breakable {
                 while (true) {
+                    dut.io.Reset_ #= i > 10
                     if (dut.io.MRD.toBoolean == false) {
                         dut.io.DataIn #= ram.read(dut.io.Addr.toInt)
                     } else {
@@ -214,6 +211,7 @@ object VIP_Test {
                         c+=1
                     }
                     dut.clockDomain.waitRisingEdge()
+                    i+=1
                 }
             }
         }
