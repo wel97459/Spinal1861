@@ -73,9 +73,9 @@ class LCD_Pixie(val Delay: BigInt) extends Component
     )
     val ParamsRom = Mem(UInt(9 bits), initParamsList.map(U(_, 9 bits)))
     val ParamsPointer = new Counter(start = 0, end = initParamsList.length)
-    val paramData = ParamsRom(ParamsPointer)
+    val paramData = RegNext(ParamsRom(ParamsPointer))
 
-    val colorByte = Reg(Bool()) init(false)
+    val colorByte = False
 
     val ScreenX = Counter(start = 0, end = 255)
     val ScreenY = Counter(start = 0, end = 127)
@@ -87,7 +87,6 @@ class LCD_Pixie(val Delay: BigInt) extends Component
     val pixels = Reg(Bits(8 bits)) init(0)
     val pixelsNext = pixels |<< 1
     val colorOut = B"16'h0000"
-
 
     when(pixels.msb)
     {
@@ -140,7 +139,7 @@ class LCD_Pixie(val Delay: BigInt) extends Component
                 when(!tft.io.fifo_full){
                     when(paramData =/= 0x1ff){
                         ParamsPointer.increment()
-                        goto(StartFrame)
+                        goto(DelayCycle)
                     }elsewhen(Pixle =/= 0) {
 
                         goto(LoadColor)
@@ -159,7 +158,6 @@ class LCD_Pixie(val Delay: BigInt) extends Component
                             PixleMul.increment()
                         }
                     }elsewhen(sink.valid) {
-                        //pixels := io.data
                         ScreenX.increment()
                         pixels := sink.payload
                         sink.ready := True
@@ -168,6 +166,13 @@ class LCD_Pixie(val Delay: BigInt) extends Component
                         goto(LoadColor)
                     }
                 }
+            }
+        }
+
+        val DelayCycle: State = new State{
+            whenIsActive {
+                data_clk := False;
+                goto(StartFrame)
             }
         }
 
@@ -182,10 +187,11 @@ class LCD_Pixie(val Delay: BigInt) extends Component
 
         val LoadColorHi: State = new State {
             onEntry{
-                data_clk := True;
+                data_clk := True
                 colorByte := True
             }
             whenIsActive {
+                colorByte := True
                 data_clk := False;
                 goto(LoadColorLo)
             }
@@ -194,7 +200,6 @@ class LCD_Pixie(val Delay: BigInt) extends Component
         val LoadColorLo: State = new State {
             onEntry{
                 data_clk := True;
-                colorByte := False
             }
             whenIsActive  {
                 data_clk := False;
@@ -208,7 +213,6 @@ class LCD_Pixie(val Delay: BigInt) extends Component
 
         val Finish: State = new State {
             whenIsActive {
-                colorByte := False;
                 goto(Done)
             }
         }
@@ -222,7 +226,7 @@ class LCD_Pixie(val Delay: BigInt) extends Component
                 ParamsPointer.clear()
                 PixleMul.clear()
                 Pixle.clear()
-                colorByte := False
+
                 when(io.startFrame){
                     goto(StartFrame)
                 }
